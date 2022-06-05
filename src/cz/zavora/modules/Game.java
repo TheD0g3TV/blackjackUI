@@ -10,6 +10,15 @@ public class Game {
         this.manager = manager;
     }
     public void start(){
+        while (true) {
+            try {
+                Blackjack b = new Blackjack();
+                break;
+            } catch(Exception e) {
+                System.out.println("Bohužel se někde stala chyba (unlucky). Hra začne znovu");
+                System.exit(0);
+            }
+        }
 
     }
 }

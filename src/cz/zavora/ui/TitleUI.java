@@ -1,24 +1,23 @@
 package cz.zavora.ui;
 
 import cz.zavora.managers.GameManager;
-import cz.zavora.modules.Game;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
 public class TitleUI extends JFrame implements ActionListener {
-    private GameManager manager;
-    JPanel mainPanel;
+    private final GameManager manager;
+    JLabel mainPanel;
     JButton buttonStart;
     JButton buttonExit;
-    JLabel bg;
-    boolean close = false;
-    boolean exit = false;
+    Clip clip;
+    AudioInputStream ais;
+    JLabel TitleText;
 
     public TitleUI(GameManager manager) throws HeadlessException, IOException {
         this.manager = manager;
@@ -31,13 +30,7 @@ public class TitleUI extends JFrame implements ActionListener {
         this.setLayout(null);
 
         title();
-
-        // action listener
-        manager.setGameUI(new GameUI(manager));
-        manager.setGame(new Game(manager));
-        this.dispose();
-        //
-
+        playMusic();
 
         this.setVisible(true);
         this.validate();
@@ -45,17 +38,23 @@ public class TitleUI extends JFrame implements ActionListener {
     }
 
     public void title() throws IOException {
-        mainPanel = new JPanel();
+        mainPanel = new JLabel();
         buttonStart = new JButton();
         buttonExit = new JButton();
-        bg = new JLabel();
-        mainPanel.add(buttonSetup(buttonStart, "Start", "pics/start.png", 500, 300, 180, 50));
-        mainPanel.add(buttonSetup(buttonExit, "Exit", "pics/exit.png", 500, 300, 180, 50));
-        bg.setIcon(new ImageIcon(ImageIO.read(new File("pics/bg.jpg"))));
-        mainPanel.add(bg);
-        bg.setBounds(0, 0, 1920, 1080);
+
+        mainPanel.add(buttonSetup(buttonStart, "Start", "pics/start.png", 750, 900, 180, 50));
+        mainPanel.add(buttonSetup(buttonExit, "Exit", "pics/exit.png", 990, 900, 180, 50));
         mainPanel.setOpaque(true);
         mainPanel.setVisible(true);
+        mainPanel.setIcon(new ImageIcon(ImageIO.read(new File("pics/bg.jpg"))));
+        mainPanel.setBounds(0, 0, 1920, 1080);
+
+        TitleText = new JLabel();
+        TitleText.setText("Welcome to BLACKJACK");
+        TitleText.setFont(new Font("Arial", Font.BOLD, 80));
+        TitleText.setBounds(460,440,1000,100);
+        mainPanel.add(TitleText);
+
         this.setContentPane(mainPanel);
     }
 
@@ -75,21 +74,28 @@ public class TitleUI extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == buttonExit) {
+            clip.stop();
             dispose();
             System.exit(0);
         }
         if (e.getSource() == buttonStart) {
             dispose();
-                manager.createLoadingUI();
-                manager.getLoadingUI().setVisible(true);
+            clip.stop();
+            manager.createLoadingUI();
+            manager.getLoadingUI().setVisible(true);
         }
     }
 
-    public boolean isClose() {
-        return close;
-    }
+    public void playMusic() {
+        try {
+            ais = AudioSystem.getAudioInputStream(new File("music/main_theme.wav"));
+            clip = AudioSystem.getClip();
+            clip.open(ais);
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
 
-    public boolean isExit() {
-        return exit;
+        clip.start();
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
 }

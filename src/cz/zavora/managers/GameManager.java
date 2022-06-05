@@ -14,21 +14,31 @@ public class GameManager {
     private LoadingUI loadingUI;
 
     public GameManager() throws IOException {
-        this.titleUI = new TitleUI(this);
+        //this.titleUI = new TitleUI(this);
+        this.gameUI = new GameUI(this);
     }
 
     public LoadingUI getLoadingUI() {
         return loadingUI;
     }
 
-    public void createLoadingUI() {
-        this.loadingUI = new LoadingUI(this);
-        this.loadingUI.start();
+    public void createLoadingUI(){
+        try {
+            this.loadingUI = new LoadingUI(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void createGameUI() {
-        this.gameUI = new GameUI(this);
+        try {
+            this.gameUI = new GameUI(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     public Game getGame() {
         return game;
